@@ -1,31 +1,26 @@
-import { type ReactNode } from 'react'
+import { motion } from 'framer-motion'
 
-type BadgeProps = {
-  children: ReactNode
-  tone?: 'accent' | 'success' | 'warning' | 'danger'
-}
+export function Badge({
+  children,
+  tone,
+}: {
+  children: React.ReactNode
+  tone: 'accent' | 'success' | 'warning' | 'danger'
+}) {
+  const map = {
+    accent: 'bg-blue-500/10 text-blue-500',
+    success: 'bg-emerald-500/10 text-emerald-500',
+    warning: 'bg-amber-500/10 text-amber-500',
+    danger: 'bg-red-500/10 text-red-500',
+  }
 
-const toneClass: Record<NonNullable<BadgeProps['tone']>, string> = {
-  accent:
-    'border-[color:rgb(var(--color-accent)/0.35)] bg-[color:rgb(var(--color-accent)/0.10)] text-[color:rgb(var(--color-accent))]',
-  success:
-    'border-[color:rgb(var(--color-success)/0.35)] bg-[color:rgb(var(--color-success)/0.10)] text-[color:rgb(var(--color-success))]',
-  warning:
-    'border-[color:rgb(var(--color-warning)/0.35)] bg-[color:rgb(var(--color-warning)/0.10)] text-[color:rgb(var(--color-warning))]',
-  danger:
-    'border-[color:rgb(var(--color-danger)/0.35)] bg-[color:rgb(var(--color-danger)/0.10)] text-[color:rgb(var(--color-danger))]',
-}
-
-export function Badge({ children, tone = 'accent' }: BadgeProps) {
   return (
-    <span
-      className={[
-        'inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium',
-        toneClass[tone],
-      ].join(' ')}
+    <motion.span
+      whileHover={{ scale: 1.06 }}
+      transition={{ type: 'spring', stiffness: 300 }}
+      className={`text-xs font-medium px-2 py-1 rounded ${map[tone]}`}
     >
       {children}
-    </span>
+    </motion.span>
   )
 }
-

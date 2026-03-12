@@ -11,22 +11,25 @@ export function FeatureSection() {
   const q = useKpiData()
   const reduceMotion = useReducedMotion()
 
-  const gridVariants = reduceMotion
+  const containerVariants = reduceMotion
     ? undefined
     : {
-        hidden: {},
+        hidden: { opacity: 0, y: 30 },
         show: {
+          opacity: 1,
+          y: 0,
           transition: {
+            duration: 0.5,
+            ease: [0.22, 1, 0.36, 1],
             staggerChildren: 0.08,
-            delayChildren: 0.05,
+            delayChildren: 0.08,
           },
         },
       }
 
-  // Telemetry: run only when status changes (guarded)
   useEffect(() => {
     if (!TELEMETRY_ENABLED) return
-    // minimal payload
+
     const payload = {
       sessionId: TELEMETRY_SESSION,
       runId: 'run1',
@@ -45,59 +48,61 @@ export function FeatureSection() {
 
     try {
       if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
-        // sendBeacon expects Blob or string — create a blob for JSON
         navigator.sendBeacon(TELEMETRY_ENDPOINT, JSON.stringify(payload))
       } else {
-        // non-blocking fetch with keepalive; it may still fail if endpoint down
         fetch(TELEMETRY_ENDPOINT, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': TELEMETRY_SESSION },
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Debug-Session-Id': TELEMETRY_SESSION,
+          },
           body: JSON.stringify(payload),
           keepalive: true,
-        }).catch(() => {
-          /* ignore telemetry errors */
-        })
+        }).catch(() => {})
       }
-    } catch {
-      /* swallow */
-    }
+    } catch {}
   }, [q.status, q.isLoading, q.isError, q.data?.kpis?.length])
 
   return (
-    <section
+    <motion.section
       aria-labelledby="feature-title"
+      variants={containerVariants}
+      initial={reduceMotion ? undefined : 'hidden'}
+      whileInView={reduceMotion ? undefined : 'show'}
+      viewport={{ once: true, margin: '-80px' }}
       className="glass rounded-[var(--radius-lg)] px-6 py-7 sm:px-10 sm:py-8"
     >
       <header className="max-w-2xl">
-        <p className="text-sm text-[rgb(var(--color-muted))]">Sustainability overview</p>
+        <p className="text-sm text-[rgb(var(--color-muted))]">
+          Sustainability overview
+        </p>
+
         <h2
           id="feature-title"
-          className="mt-2 text-balance font-semibold tracking-tight text-[rgb(var(--color-text))]"
-          style={{ fontSize: 'var(--text-2xl)' }}
+          className="mt-2 font-semibold tracking-tight text-[rgb(var(--color-text))]"
+          style={{ fontSize: 'clamp(1.6rem,2.2vw,2rem)' }}
         >
           Sustainability impact pulse
         </h2>
-        <p className="mt-3 text-pretty text-[rgb(var(--color-muted))]">
+
+        <p className="mt-3 text-[rgb(var(--color-muted))] max-w-xl">
           See, at a glance, how climate-friendly your digital portfolio looks right now.
         </p>
       </header>
 
       <motion.div
-        className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
-        variants={gridVariants}
-        initial={reduceMotion ? undefined : 'hidden'}
-        whileInView={reduceMotion ? undefined : 'show'}
-        viewport={{ once: true, amount: 0.35 }}
+        className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        variants={containerVariants}
       >
         {q.isLoading ? (
           Array.from({ length: 4 }).map((_, i) => (
             <div
               key={i}
-              className="rounded-[var(--radius-md)] border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-4 shadow-[var(--shadow-sm)]"
+              className="rounded-[var(--radius-md)] border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-4 animate-pulse"
             >
-              <div className="h-4 w-24 rounded bg-[rgb(var(--color-border))] opacity-60" />
-              <div className="mt-3 h-8 w-32 rounded bg-[rgb(var(--color-border))] opacity-40" />
-              <div className="mt-3 h-3 w-40 rounded bg-[rgb(var(--color-border))] opacity-30" />
+              <div className="h-4 w-24 rounded bg-[rgb(var(--color-border))]" />
+              <div className="mt-4 h-8 w-28 rounded bg-[rgb(var(--color-border))]" />
+              <div className="mt-3 h-3 w-36 rounded bg-[rgb(var(--color-border))]" />
             </div>
           ))
         ) : q.isError ? (
@@ -106,9 +111,11 @@ export function FeatureSection() {
               <p className="text-sm font-medium text-[rgb(var(--color-text))]">
                 Couldn’t load KPIs.
               </p>
+
               <p className="mt-1 text-sm text-[rgb(var(--color-muted))]">
                 Check your connection and try again.
               </p>
+
               <button
                 type="button"
                 onClick={() => q.refetch()}
@@ -118,11 +125,11 @@ export function FeatureSection() {
               </button>
             </div>
           </div>
-        ) : q.data?.kpis ? (
-          q.data.kpis.map((kpi) => <KpiCard key={kpi.id} kpi={kpi} />)
-        ) : null}
+        ) : (
+          q.data?.kpis?.map((kpi) => <KpiCard key={kpi.id} kpi={kpi} />)
+        )}
       </motion.div>
-    </section>
+    </motion.section>
   )
 }
 
