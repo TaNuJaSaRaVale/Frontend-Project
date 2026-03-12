@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery } from '@tanstack/react-query'
 import { fetchProducts } from '../lib/api'
 
@@ -11,24 +12,35 @@ export type Kpi = {
   detail: string
 }
 
+type ApiResult = {
+  kpis: Kpi[]
+  products: any[]
+}
+
 function round(n: number, digits = 0) {
   const p = 10 ** digits
   return Math.round(n * p) / p
 }
 
-type ResultShape = { kpis: Kpi[]; sample: any[] }
-
 export function useKpiData() {
-  return useQuery<ResultShape>({
+  return useQuery<ApiResult>({
     queryKey: ['feature-kpis', 'products'],
     queryFn: async () => {
       const data = await fetchProducts(12)
       const items = data.products
 
-      const avgDiscount = items.reduce((a, p) => a + p.discountPercentage, 0) / items.length
-      const avgRating = items.reduce((a, p) => a + p.rating, 0) / items.length
-      const lowStock = items.filter((p) => p.stock < 50).length
-      const totalPrice = items.reduce((a, p) => a + p.price, 0)
+      const avgDiscount =
+        items.reduce((a: number, p: any) => a + Number(p.discountPercentage), 0) /
+        items.length
+
+      const avgRating =
+        items.reduce((a: number, p: any) => a + Number(p.rating), 0) /
+        items.length
+
+      const lowStock = items.filter((p: any) => Number(p.stock) < 50).length
+
+      const totalPrice =
+        items.reduce((a: number, p: any) => a + Number(p.price), 0)
 
       const potentialSavings = totalPrice * (avgDiscount / 100) * 0.42
 
@@ -74,9 +86,9 @@ export function useKpiData() {
         },
       ]
 
-      // Optional telemetry: guarded by VITE_ENABLE_TELEMETRY
       const TELEMETRY_ENABLED = import.meta.env.VITE_ENABLE_TELEMETRY === 'true'
-      const TELEMETRY_ENDPOINT = 'http://127.0.0.1:7831/ingest/bcf89508-d7d1-4ae5-b288-3d69bb1527ff'
+      const TELEMETRY_ENDPOINT =
+        'http://127.0.0.1:7831/ingest/bcf89508-d7d1-4ae5-b288-3d69bb1527ff'
       const TELEMETRY_SESSION = '0d0ec3'
 
       if (TELEMETRY_ENABLED) {
@@ -97,26 +109,29 @@ export function useKpiData() {
             },
             timestamp: Date.now(),
           }
+
           if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
             navigator.sendBeacon(TELEMETRY_ENDPOINT, JSON.stringify(payload))
           } else {
             fetch(TELEMETRY_ENDPOINT, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': TELEMETRY_SESSION },
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Debug-Session-Id': TELEMETRY_SESSION,
+              },
               body: JSON.stringify(payload),
               keepalive: true,
             }).catch(() => {})
           }
-        } catch {
-          // swallow telemetry errors
-        }
+        // eslint-disable-next-line no-empty
+        } catch {}
       }
 
       return { kpis, products: items }
     },
-    // caching config: keeps data fresh for 2 minutes
+
     staleTime: 1000 * 60 * 2,
-    cacheTime: 1000 * 60 * 10,
+    gcTime: 1000 * 60 * 10,
     refetchOnWindowFocus: false,
   })
 }

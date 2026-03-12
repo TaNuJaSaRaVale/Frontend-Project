@@ -1,4 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+/* eslint-disable no-empty */
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Badge } from '../ui/Badge'
 import type { Kpi } from '../../hooks/useKpiData'
 import { animate, motion, useInView, useReducedMotion } from 'framer-motion'

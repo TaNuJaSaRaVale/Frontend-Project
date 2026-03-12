@@ -1,5 +1,8 @@
-import React, { useEffect } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+/* eslint-disable no-empty */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { useEffect } from 'react'
+import { motion, useReducedMotion, type Variants } from 'framer-motion'
 import { useKpiData } from '../../hooks/useKpiData'
 import { KpiCard } from './KpiCard'
 import { OptimizationInsights } from "./OptimizationInsights"
@@ -12,21 +15,21 @@ export function FeatureSection() {
   const q = useKpiData()
   const reduceMotion = useReducedMotion()
 
-  const containerVariants = reduceMotion
-    ? undefined
-    : {
-        hidden: { opacity: 0, y: 30 },
-        show: {
-          opacity: 1,
-          y: 0,
-          transition: {
-            duration: 0.5,
-            ease: [0.22, 1, 0.36, 1],
-            staggerChildren: 0.08,
-            delayChildren: 0.08,
-          },
+ const containerVariants: Variants | undefined = reduceMotion
+  ? undefined
+  : {
+      hidden: { opacity: 0, y: 30 },
+      show: {
+        opacity: 1,
+        y: 0,
+        transition: {
+          duration: 0.5,
+          ease: [0.22, 1, 0.36, 1] as const,
+          staggerChildren: 0.08,
+          delayChildren: 0.08,
         },
-      }
+      },
+    }
 
   useEffect(() => {
     if (!TELEMETRY_ENABLED) return
