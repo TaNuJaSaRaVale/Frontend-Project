@@ -1,0 +1,94 @@
+:root {
+  /* ===== Color tokens (light) ===== */
+  --color-bg: 248 250 252; /* slate-50 */
+  --color-surface: 255 255 255;
+  --color-surface-2: 241 245 249; /* slate-100 */
+  --color-text: 15 23 42; /* slate-900 */
+  --color-muted: 71 85 105; /* slate-600 */
+  --color-border: 226 232 240; /* slate-200 */
+
+  --color-accent: 14 165 233; /* sky-500 */
+  --color-success: 34 197 94; /* green-500 */
+  --color-warning: 245 158 11; /* amber-500 */
+  --color-danger: 239 68 68; /* red-500 */
+
+  /* Glass */
+  --glass-bg: 255 255 255;
+  --glass-alpha: 0.7;
+  --glass-border-alpha: 0.55;
+
+  /* Shadows */
+  --shadow-color: 15 23 42;
+  --shadow-sm: 0 1px 2px rgb(var(--shadow-color) / 0.08);
+  --shadow-md: 0 14px 40px rgb(var(--shadow-color) / 0.12);
+
+  /* ===== Layout tokens ===== */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Fluid type */
+  --text-xs: clamp(0.78rem, 0.75rem + 0.1vw, 0.82rem);
+  --text-sm: clamp(0.88rem, 0.84rem + 0.15vw, 0.95rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.1rem);
+  --text-lg: clamp(1.15rem, 1.05rem + 0.6vw, 1.35rem);
+  --text-xl: clamp(1.35rem, 1.15rem + 1.1vw, 1.75rem);
+  --text-2xl: clamp(1.6rem, 1.25rem + 1.8vw, 2.25rem);
+}
+
+/* Bonus-ready dark mode: toggle by adding data-theme="dark" on <html> */
+html[data-theme='dark'] {
+  --color-bg: 2 6 23; /* slate-950 */
+  --color-surface: 15 23 42; /* slate-900 */
+  --color-surface-2: 30 41 59; /* slate-800 */
+  --color-text: 241 245 249; /* slate-100 */
+  --color-muted: 148 163 184; /* slate-400 */
+  --color-border: 51 65 85; /* slate-700 */
+
+  --glass-bg: 15 23 42;
+  --glass-alpha: 0.55;
+  --glass-border-alpha: 0.35;
+
+  --shadow-color: 0 0 0;
+}
+
+/* Base styling helpers (still token-driven) */
+html {
+  color-scheme: light dark;
+  background: rgb(var(--color-bg));
+}
+
+body {
+  color: rgb(var(--color-text));
+}
+
+/* Ocean vibe accent glow you can reuse in cards */
+.ocean-glow {
+  background:
+    radial-gradient(600px circle at 20% 10%, rgb(var(--color-accent) / 0.22), transparent 55%),
+    radial-gradient(500px circle at 80% 30%, rgb(var(--color-success) / 0.16), transparent 60%),
+    radial-gradient(700px circle at 50% 90%, rgb(var(--color-accent) / 0.12), transparent 60%);
+}
+
+.glass {
+  background: rgb(var(--glass-bg) / var(--glass-alpha));
+  border: 1px solid rgb(var(--color-border) / var(--glass-border-alpha));
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(12px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+}

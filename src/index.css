@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import './tokens/theme.css';
+
+/* Minimal base styles: keep them token-driven */
+:root {
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial,
+    'Apple Color Emoji', 'Segoe UI Emoji';
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-inline-size: 320px;
+  min-block-size: 100dvh;
+  background: rgb(var(--color-bg));
+}
+
+/* Accessible focus ring (token-based) */
+:where(a, button, input, textarea, select, [role='button']):focus-visible {
+  outline: 2px solid rgb(var(--color-accent) / 0.9);
+  outline-offset: 2px;
+}
