@@ -63,8 +63,33 @@ export function KpiCard({ kpi }: { kpi: Kpi }) {
     <motion.article
       ref={ref}
       variants={cardVariants}
-      className="rounded-[var(--radius-md)] border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] p-4 shadow-[var(--shadow-sm)] transition will-change-transform hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]"
+      className="rounded-[var(--radius-md)] border-2 border-red-500 bg-[rgb(var(--color-surface))] p-4 shadow-[var(--shadow-sm)]"
     >
+      {/* #region agent log */}
+      {(() => {
+        fetch('http://127.0.0.1:7831/ingest/bcf89508-d7d1-4ae5-b288-3d69bb1527ff', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Debug-Session-Id': '0d0ec3',
+          },
+          body: JSON.stringify({
+            sessionId: '0d0ec3',
+            runId: 'run1',
+            hypothesisId: 'H3',
+            location: 'KpiCard.tsx:render',
+            message: 'KpiCard render',
+            data: {
+              id: kpi.id,
+              label: kpi.label,
+              value: kpi.value,
+            },
+            timestamp: Date.now(),
+          }),
+        }).catch(() => {})
+        return null
+      })()}
+      {/* #endregion agent log */}
       <header className="flex items-start justify-between gap-3">
         <h3 className="text-sm font-medium text-[rgb(var(--color-muted))]">{kpi.label}</h3>
         {deltaText ? <Badge tone={kpi.tone}>{deltaText}</Badge> : null}

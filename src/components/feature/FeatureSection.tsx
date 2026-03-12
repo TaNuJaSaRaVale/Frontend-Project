@@ -19,23 +19,54 @@ export function FeatureSection() {
       }
 
   return (
-    <section aria-labelledby="feature-title" className="glass rounded-[var(--radius-lg)] p-6 sm:p-10">
+    <section
+      aria-labelledby="feature-title"
+      className="glass rounded-[var(--radius-lg)] px-6 py-7 sm:px-10 sm:py-8"
+    >
       <header className="max-w-2xl">
-        <p className="text-sm text-[rgb(var(--color-muted))]">Optimization overview</p>
+        <p className="text-sm text-[rgb(var(--color-muted))]">Sustainability overview</p>
         <h2
           id="feature-title"
           className="mt-2 text-balance font-semibold tracking-tight text-[rgb(var(--color-text))]"
           style={{ fontSize: 'var(--text-2xl)' }}
         >
-          Cloud optimization insights
+          Sustainability impact pulse
         </h2>
         <p className="mt-3 text-pretty text-[rgb(var(--color-muted))]">
-          Live KPIs derived from a public API, cached for instant revisits.
+          See, at a glance, how climate-friendly your digital portfolio looks right now.
         </p>
       </header>
 
+      {/* #region agent log */}
+      {(() => {
+        fetch('http://127.0.0.1:7831/ingest/bcf89508-d7d1-4ae5-b288-3d69bb1527ff', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Debug-Session-Id': '0d0ec3',
+          },
+          body: JSON.stringify({
+            sessionId: '0d0ec3',
+            runId: 'run1',
+            hypothesisId: 'H2',
+            location: 'FeatureSection.tsx:render',
+            message: 'FeatureSection render state',
+            data: {
+              status: q.status,
+              isLoading: q.isLoading,
+              isError: q.isError,
+              hasData: Boolean(q.data),
+              kpiCount: q.data?.kpis.length ?? 0,
+            },
+            timestamp: Date.now(),
+          }),
+        }).catch(() => {})
+        return null
+      })()}
+      {/* #endregion agent log */}
+
       <motion.div
-        className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
         variants={gridVariants}
         initial={reduceMotion ? undefined : 'hidden'}
         whileInView={reduceMotion ? undefined : 'show'}

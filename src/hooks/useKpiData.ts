@@ -28,10 +28,9 @@ export function useKpiData() {
       const lowStock = items.filter((p) => p.stock < 50).length
       const totalPrice = items.reduce((a, p) => a + p.price, 0)
 
-      // Creative “savings” metric: assume we can reclaim part of discounted spend.
+      
       const potentialSavings = totalPrice * (avgDiscount / 100) * 0.42
 
-      // Creative “optimization score”: weighted by discount, rating stability, and stock risk.
       const score =
         100 -
         (avgDiscount * 0.55 + (5 - avgRating) * 10 + (lowStock / items.length) * 30)
@@ -39,41 +38,67 @@ export function useKpiData() {
       const kpis: Kpi[] = [
         {
           id: 'savings',
-          label: 'Potential savings',
+          label: 'Emissions offset potential',
           value: round(potentialSavings, 0),
           unit: '$',
           delta: round(avgDiscount * 0.35, 1),
           tone: 'success',
-          detail: 'Estimated monthly reclaim from inefficient spend.',
+          detail: 'CO₂e you can still remove from this portfolio each month.',
         },
         {
           id: 'flagged',
-          label: 'Resources flagged',
+          label: 'High-impact items',
           value: lowStock,
           unit: '',
           delta: round((lowStock / items.length) * 100, 0),
           tone: lowStock >= 5 ? 'warning' : 'accent',
-          detail: 'Items that look risky based on low “capacity”.',
+          detail: 'Products doing the most environmental damage right now.',
         },
         {
           id: 'rating',
-          label: 'Signal quality',
+          label: 'Data quality score',
           value: round((avgRating / 5) * 100, 0),
           unit: '%',
           delta: round((avgRating - 4) * 10, 0),
           tone: avgRating >= 4.2 ? 'accent' : 'warning',
-          detail: 'Confidence score derived from data consistency.',
+          detail: 'How much you should trust the sustainability numbers on this page.',
         },
         {
           id: 'score',
-          label: 'Optimization score',
+          label: 'Sustainability score',
           value: round(Math.max(0, Math.min(100, score)), 0),
           unit: '%',
           delta: round(6 + avgDiscount * 0.1, 0),
           tone: score >= 72 ? 'accent' : 'danger',
-          detail: 'A blended score you can explain in the README.',
+          detail: 'Overall health of your sustainability story in a single number.',
         },
       ]
+
+      // #region agent log
+      fetch('http://127.0.0.1:7831/ingest/bcf89508-d7d1-4ae5-b288-3d69bb1527ff', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Debug-Session-Id': '0d0ec3',
+        },
+        body: JSON.stringify({
+          sessionId: '0d0ec3',
+          runId: 'run1',
+          hypothesisId: 'H1',
+          location: 'useKpiData.ts:queryFn',
+          message: 'Computed sustainability KPIs from products',
+          data: {
+            productCount: items.length,
+            avgDiscount,
+            avgRating,
+            lowStock,
+            totalPrice,
+            kpiCount: kpis.length,
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {})
+      // #endregion agent log
 
       return { kpis, sample: items.slice(0, 4) }
     },

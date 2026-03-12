@@ -1,8 +1,8 @@
+@import './tokens/theme.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import './tokens/theme.css';
 
 /* Minimal base styles: keep them token-driven */
 :root {
