@@ -153,41 +153,14 @@ To keep the implementation focused within the time limit:
 
 ---
 
-## Future Improvements
-
-If given more time, I would add:
-
-* Dark mode support using the token system
-* Container queries for component-level responsiveness
-* Additional visualizations such as animated charts
-* User-controlled metric filtering
-* Live data updates
-
----
 
 ## Live Demo
 
 Deployed via **Vercel**
 
 Live URL:
-[Add your Vercel link here]
+[[Add your Vercel link here](https://frontendkpi.vercel.app/)]
 
 ---
 
-## Repository
 
-GitHub Repository:
-[Add your GitHub repository link here]
-
----
-
-## How to Run Locally
-
-Clone the repository:
-
-npm install
-npm run dev
-
-The app will run at:
-
-http://localhost:5173
