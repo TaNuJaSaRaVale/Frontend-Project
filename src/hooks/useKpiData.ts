@@ -112,7 +112,7 @@ export function useKpiData() {
         }
       }
 
-      return { kpis, sample: items.slice(0, 4) }
+      return { kpis, products: items }
     },
     // caching config: keeps data fresh for 2 minutes
     staleTime: 1000 * 60 * 2,

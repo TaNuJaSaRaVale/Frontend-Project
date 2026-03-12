@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { useKpiData } from '../../hooks/useKpiData'
 import { KpiCard } from './KpiCard'
+import { OptimizationInsights } from "./OptimizationInsights"
 
 const TELEMETRY_ENABLED = import.meta.env.VITE_ENABLE_TELEMETRY === 'true'
 const TELEMETRY_ENDPOINT = 'http://127.0.0.1:7831/ingest/bcf89508-d7d1-4ae5-b288-3d69bb1527ff'
@@ -129,6 +130,9 @@ export function FeatureSection() {
           q.data?.kpis?.map((kpi) => <KpiCard key={kpi.id} kpi={kpi} />)
         )}
       </motion.div>
+
+     <OptimizationInsights />
+
     </motion.section>
   )
 }
