@@ -45,6 +45,13 @@
   --text-xl: clamp(1.35rem, 1.15rem + 1.1vw, 1.75rem);
   --text-2xl: clamp(1.6rem, 1.25rem + 1.8vw, 2.25rem);
 }
+.dark {
+  --color-bg: 15 23 42;
+  --color-surface: 30 41 59;
+  --color-text: 248 250 252;
+  --color-muted: 148 163 184;
+  --color-border: 71 85 105;
+}
 
 
 html[data-theme='dark'] {
