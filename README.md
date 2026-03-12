@@ -159,7 +159,7 @@ To keep the implementation focused within the time limit:
 Deployed via **Vercel**
 
 Live URL:
-[[Add your Vercel link here](https://frontendkpi.vercel.app/)]
+[KPI](https://frontendkpi.vercel.app/)]
 
 ---
 
