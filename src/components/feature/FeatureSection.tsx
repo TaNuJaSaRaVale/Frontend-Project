@@ -1,6 +1,11 @@
+import React, { useEffect } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { useKpiData } from '../../hooks/useKpiData'
 import { KpiCard } from './KpiCard'
-import { motion, useReducedMotion } from 'framer-motion'
+
+const TELEMETRY_ENABLED = import.meta.env.VITE_ENABLE_TELEMETRY === 'true'
+const TELEMETRY_ENDPOINT = 'http://127.0.0.1:7831/ingest/bcf89508-d7d1-4ae5-b288-3d69bb1527ff'
+const TELEMETRY_SESSION = '0d0ec3'
 
 export function FeatureSection() {
   const q = useKpiData()
@@ -17,6 +22,46 @@ export function FeatureSection() {
           },
         },
       }
+
+  // Telemetry: run only when status changes (guarded)
+  useEffect(() => {
+    if (!TELEMETRY_ENABLED) return
+    // minimal payload
+    const payload = {
+      sessionId: TELEMETRY_SESSION,
+      runId: 'run1',
+      hypothesisId: 'H2',
+      location: 'FeatureSection.tsx:useEffect',
+      message: 'FeatureSection query state',
+      data: {
+        status: q.status,
+        isLoading: q.isLoading,
+        isError: q.isError,
+        hasData: Boolean(q.data),
+        kpiCount: q.data?.kpis?.length ?? 0,
+      },
+      timestamp: Date.now(),
+    }
+
+    try {
+      if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
+        // sendBeacon expects Blob or string — create a blob for JSON
+        navigator.sendBeacon(TELEMETRY_ENDPOINT, JSON.stringify(payload))
+      } else {
+        // non-blocking fetch with keepalive; it may still fail if endpoint down
+        fetch(TELEMETRY_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': TELEMETRY_SESSION },
+          body: JSON.stringify(payload),
+          keepalive: true,
+        }).catch(() => {
+          /* ignore telemetry errors */
+        })
+      }
+    } catch {
+      /* swallow */
+    }
+  }, [q.status, q.isLoading, q.isError, q.data?.kpis?.length])
 
   return (
     <section
@@ -36,34 +81,6 @@ export function FeatureSection() {
           See, at a glance, how climate-friendly your digital portfolio looks right now.
         </p>
       </header>
-
-      {/* #region agent log */}
-      {(() => {
-        fetch('http://127.0.0.1:7831/ingest/bcf89508-d7d1-4ae5-b288-3d69bb1527ff', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Debug-Session-Id': '0d0ec3',
-          },
-          body: JSON.stringify({
-            sessionId: '0d0ec3',
-            runId: 'run1',
-            hypothesisId: 'H2',
-            location: 'FeatureSection.tsx:render',
-            message: 'FeatureSection render state',
-            data: {
-              status: q.status,
-              isLoading: q.isLoading,
-              isError: q.isError,
-              hasData: Boolean(q.data),
-              kpiCount: q.data?.kpis.length ?? 0,
-            },
-            timestamp: Date.now(),
-          }),
-        }).catch(() => {})
-        return null
-      })()}
-      {/* #endregion agent log */}
 
       <motion.div
         className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
@@ -101,11 +118,12 @@ export function FeatureSection() {
               </button>
             </div>
           </div>
-        ) : (
-          q.data ? q.data.kpis.map((kpi) => <KpiCard key={kpi.id} kpi={kpi} />) : null
-        )}
+        ) : q.data?.kpis ? (
+          q.data.kpis.map((kpi) => <KpiCard key={kpi.id} kpi={kpi} />)
+        ) : null}
       </motion.div>
     </section>
   )
 }
 
+export default FeatureSection

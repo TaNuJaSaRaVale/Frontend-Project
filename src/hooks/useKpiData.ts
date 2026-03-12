@@ -16,8 +16,10 @@ function round(n: number, digits = 0) {
   return Math.round(n * p) / p
 }
 
+type ResultShape = { kpis: Kpi[]; sample: any[] }
+
 export function useKpiData() {
-  return useQuery({
+  return useQuery<ResultShape>({
     queryKey: ['feature-kpis', 'products'],
     queryFn: async () => {
       const data = await fetchProducts(12)
@@ -28,12 +30,10 @@ export function useKpiData() {
       const lowStock = items.filter((p) => p.stock < 50).length
       const totalPrice = items.reduce((a, p) => a + p.price, 0)
 
-      
       const potentialSavings = totalPrice * (avgDiscount / 100) * 0.42
 
       const score =
-        100 -
-        (avgDiscount * 0.55 + (5 - avgRating) * 10 + (lowStock / items.length) * 30)
+        100 - (avgDiscount * 0.55 + (5 - avgRating) * 10 + (lowStock / items.length) * 30)
 
       const kpis: Kpi[] = [
         {
@@ -74,34 +74,49 @@ export function useKpiData() {
         },
       ]
 
-      // #region agent log
-      fetch('http://127.0.0.1:7831/ingest/bcf89508-d7d1-4ae5-b288-3d69bb1527ff', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Debug-Session-Id': '0d0ec3',
-        },
-        body: JSON.stringify({
-          sessionId: '0d0ec3',
-          runId: 'run1',
-          hypothesisId: 'H1',
-          location: 'useKpiData.ts:queryFn',
-          message: 'Computed sustainability KPIs from products',
-          data: {
-            productCount: items.length,
-            avgDiscount,
-            avgRating,
-            lowStock,
-            totalPrice,
-            kpiCount: kpis.length,
-          },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {})
-      // #endregion agent log
+      // Optional telemetry: guarded by VITE_ENABLE_TELEMETRY
+      const TELEMETRY_ENABLED = import.meta.env.VITE_ENABLE_TELEMETRY === 'true'
+      const TELEMETRY_ENDPOINT = 'http://127.0.0.1:7831/ingest/bcf89508-d7d1-4ae5-b288-3d69bb1527ff'
+      const TELEMETRY_SESSION = '0d0ec3'
+
+      if (TELEMETRY_ENABLED) {
+        try {
+          const payload = {
+            sessionId: TELEMETRY_SESSION,
+            runId: 'run1',
+            hypothesisId: 'H1',
+            location: 'useKpiData.ts:queryFn',
+            message: 'Computed sustainability KPIs from products',
+            data: {
+              productCount: items.length,
+              avgDiscount,
+              avgRating,
+              lowStock,
+              totalPrice,
+              kpiCount: kpis.length,
+            },
+            timestamp: Date.now(),
+          }
+          if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
+            navigator.sendBeacon(TELEMETRY_ENDPOINT, JSON.stringify(payload))
+          } else {
+            fetch(TELEMETRY_ENDPOINT, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': TELEMETRY_SESSION },
+              body: JSON.stringify(payload),
+              keepalive: true,
+            }).catch(() => {})
+          }
+        } catch {
+          // swallow telemetry errors
+        }
+      }
 
       return { kpis, sample: items.slice(0, 4) }
     },
+    // caching config: keeps data fresh for 2 minutes
+    staleTime: 1000 * 60 * 2,
+    cacheTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
   })
 }
-

@@ -87,7 +87,7 @@ body {
   backdrop-filter: blur(12px);
 }
 
-@media (prefers-reduced-motion: reduce) {
+@container (prefers-reduced-motion: reduce) {
   html:focus-within {
     scroll-behavior: auto;
   }
