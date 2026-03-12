@@ -1,8 +1,22 @@
 import { useKpiData } from '../../hooks/useKpiData'
 import { KpiCard } from './KpiCard'
+import { motion, useReducedMotion } from 'framer-motion'
 
 export function FeatureSection() {
   const q = useKpiData()
+  const reduceMotion = useReducedMotion()
+
+  const gridVariants = reduceMotion
+    ? undefined
+    : {
+        hidden: {},
+        show: {
+          transition: {
+            staggerChildren: 0.08,
+            delayChildren: 0.05,
+          },
+        },
+      }
 
   return (
     <section aria-labelledby="feature-title" className="glass rounded-[var(--radius-lg)] p-6 sm:p-10">
@@ -20,7 +34,13 @@ export function FeatureSection() {
         </p>
       </header>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <motion.div
+        className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        variants={gridVariants}
+        initial={reduceMotion ? undefined : 'hidden'}
+        whileInView={reduceMotion ? undefined : 'show'}
+        viewport={{ once: true, amount: 0.35 }}
+      >
         {q.isLoading ? (
           Array.from({ length: 4 }).map((_, i) => (
             <div
@@ -51,9 +71,9 @@ export function FeatureSection() {
             </div>
           </div>
         ) : (
-          q.data.kpis.map((kpi) => <KpiCard key={kpi.id} kpi={kpi} />)
+          q.data ? q.data.kpis.map((kpi) => <KpiCard key={kpi.id} kpi={kpi} />) : null
         )}
-      </div>
+      </motion.div>
     </section>
   )
 }
