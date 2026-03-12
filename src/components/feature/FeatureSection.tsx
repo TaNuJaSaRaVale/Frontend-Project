@@ -1,45 +1,48 @@
+/* src/components/feature/FeatureSection.tsx */
 /* eslint-disable no-empty */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useEffect } from 'react'
-import { motion, useReducedMotion, type Variants } from 'framer-motion'
-import { useKpiData } from '../../hooks/useKpiData'
-import { KpiCard } from './KpiCard'
-import { OptimizationInsights } from "./OptimizationInsights"
 
-const TELEMETRY_ENABLED = import.meta.env.VITE_ENABLE_TELEMETRY === 'true'
-const TELEMETRY_ENDPOINT = 'http://127.0.0.1:7831/ingest/bcf89508-d7d1-4ae5-b288-3d69bb1527ff'
-const TELEMETRY_SESSION = '0d0ec3'
+import { useEffect } from "react"
+import { motion, useReducedMotion, type Variants } from "framer-motion"
+import { useKpiData } from "../../hooks/useKpiData"
+import { KpiCard } from "./KpiCard"
+import OptimizationInsights from "./OptimizationInsights"
+
+const TELEMETRY_ENABLED = import.meta.env.VITE_ENABLE_TELEMETRY === "true"
+const TELEMETRY_ENDPOINT =
+  "http://127.0.0.1:7831/ingest/bcf89508-d7d1-4ae5-b288-3d69bb1527ff"
+const TELEMETRY_SESSION = "0d0ec3"
 
 export function FeatureSection() {
   const q = useKpiData()
   const reduceMotion = useReducedMotion()
 
- const containerVariants: Variants | undefined = reduceMotion
-  ? undefined
-  : {
-      hidden: { opacity: 0, y: 30 },
-      show: {
-        opacity: 1,
-        y: 0,
-        transition: {
-          duration: 0.5,
-          ease: [0.22, 1, 0.36, 1] as const,
-          staggerChildren: 0.08,
-          delayChildren: 0.08,
+  const containerVariants: Variants | undefined = reduceMotion
+    ? undefined
+    : {
+        hidden: { opacity: 0, y: 30 },
+        show: {
+          opacity: 1,
+          y: 0,
+          transition: {
+            duration: 0.5,
+            ease: [0.22, 1, 0.36, 1] as const,
+            staggerChildren: 0.08,
+            delayChildren: 0.08,
+          },
         },
-      },
-    }
+      }
 
   useEffect(() => {
     if (!TELEMETRY_ENABLED) return
 
     const payload = {
       sessionId: TELEMETRY_SESSION,
-      runId: 'run1',
-      hypothesisId: 'H2',
-      location: 'FeatureSection.tsx:useEffect',
-      message: 'FeatureSection query state',
+      runId: "run1",
+      hypothesisId: "H2",
+      location: "FeatureSection.tsx:useEffect",
+      message: "FeatureSection query state",
       data: {
         status: q.status,
         isLoading: q.isLoading,
@@ -51,14 +54,14 @@ export function FeatureSection() {
     }
 
     try {
-      if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
+      if (typeof navigator !== "undefined" && "sendBeacon" in navigator) {
         navigator.sendBeacon(TELEMETRY_ENDPOINT, JSON.stringify(payload))
       } else {
         fetch(TELEMETRY_ENDPOINT, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'X-Debug-Session-Id': TELEMETRY_SESSION,
+            "Content-Type": "application/json",
+            "X-Debug-Session-Id": TELEMETRY_SESSION,
           },
           body: JSON.stringify(payload),
           keepalive: true,
@@ -71,9 +74,9 @@ export function FeatureSection() {
     <motion.section
       aria-labelledby="feature-title"
       variants={containerVariants}
-      initial={reduceMotion ? undefined : 'hidden'}
-      whileInView={reduceMotion ? undefined : 'show'}
-      viewport={{ once: true, margin: '-80px' }}
+      initial={reduceMotion ? undefined : "hidden"}
+      whileInView={reduceMotion ? undefined : "show"}
+      viewport={{ once: true, margin: "-80px" }}
       className="glass rounded-[var(--radius-lg)] px-6 py-7 sm:px-10 sm:py-8"
     >
       <header className="max-w-2xl">
@@ -84,13 +87,14 @@ export function FeatureSection() {
         <h2
           id="feature-title"
           className="mt-2 font-semibold tracking-tight text-[rgb(var(--color-text))]"
-          style={{ fontSize: 'clamp(1.6rem,2.2vw,2rem)' }}
+          style={{ fontSize: "clamp(1.6rem,2.2vw,2rem)" }}
         >
           Sustainability impact pulse
         </h2>
 
         <p className="mt-3 text-[rgb(var(--color-muted))] max-w-xl">
-          See, at a glance, how climate-friendly your digital portfolio looks right now.
+          See, at a glance, how climate-friendly your digital portfolio looks
+          right now.
         </p>
       </header>
 
@@ -134,8 +138,7 @@ export function FeatureSection() {
         )}
       </motion.div>
 
-     <OptimizationInsights />
-
+      <OptimizationInsights />
     </motion.section>
   )
 }

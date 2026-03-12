@@ -1,7 +1,17 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { motion, useReducedMotion, type Variants } from "framer-motion"
 import { useKpiData } from "../../hooks/useKpiData"
+
+type InsightIcon = "warning" | "star" | "chart"
+
+type Insight = {
+  key: string
+  label: string
+  value: string
+  detail: string
+  icon: InsightIcon
+}
 
 export function OptimizationInsights() {
   const { data } = useKpiData()
@@ -20,7 +30,7 @@ export function OptimizationInsights() {
     products.reduce((a: number, p: any) => a + p.discountPercentage, 0) /
     products.length
 
-  const insights = [
+  const insights: Insight[] = [
     {
       key: "lowStock",
       label: "Low-stock risk",
@@ -44,7 +54,7 @@ export function OptimizationInsights() {
     },
   ]
 
-  const container = reduceMotion
+  const container: Variants | undefined = reduceMotion
     ? undefined
     : {
         hidden: {},
@@ -56,7 +66,7 @@ export function OptimizationInsights() {
         },
       }
 
-  const item = reduceMotion
+  const item: Variants | undefined = reduceMotion
     ? undefined
     : {
         hidden: { opacity: 0, y: 24 },
@@ -65,17 +75,17 @@ export function OptimizationInsights() {
           y: 0,
           transition: {
             duration: 0.38,
-            ease: [0.22, 1, 0.36, 1] as const,
+            ease: [0.22, 1, 0.36, 1],
           },
         },
       }
 
-  function Icon({ kind }: { kind: "warning" | "star" | "chart" }) {
+  function Icon({ kind }: { kind: InsightIcon }) {
     if (kind === "warning")
       return (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path d="M12 9v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-          <circle cx="12" cy="17" r="1" fill="currentColor"/>
+          <path d="M12 9v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <circle cx="12" cy="17" r="1" fill="currentColor" />
           <path
             d="M10 3.5L2.5 19a2 2 0 001.8 3h15.4a2 2 0 001.8-3L14 3.5a2 2 0 00-3.6 0z"
             stroke="currentColor"
@@ -99,10 +109,10 @@ export function OptimizationInsights() {
 
     return (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <path d="M3 20h18" stroke="currentColor" strokeWidth="1.5"/>
-        <rect x="6" y="10" width="3" height="6" rx="1" fill="currentColor"/>
-        <rect x="11" y="7" width="3" height="9" rx="1" fill="currentColor"/>
-        <rect x="16" y="4" width="3" height="12" rx="1" fill="currentColor"/>
+        <path d="M3 20h18" stroke="currentColor" strokeWidth="1.5" />
+        <rect x="6" y="10" width="3" height="6" rx="1" fill="currentColor" />
+        <rect x="11" y="7" width="3" height="9" rx="1" fill="currentColor" />
+        <rect x="16" y="4" width="3" height="12" rx="1" fill="currentColor" />
       </svg>
     )
   }
@@ -140,7 +150,7 @@ export function OptimizationInsights() {
                   transition={{ duration: 2, repeat: Infinity }}
                   className="flex items-center justify-center"
                 >
-                  <Icon kind={ins.icon as any} />
+                  <Icon kind={ins.icon} />
                 </motion.span>
               </div>
 
